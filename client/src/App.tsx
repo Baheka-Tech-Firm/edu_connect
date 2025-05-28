@@ -8,6 +8,10 @@ import { BookOpen, Users, Award, Brain, GraduationCap, Target, Zap, Rocket, Glob
 import Home from "./pages/dashboard";
 import Courses from "./pages/courses";
 import Profile from "./pages/profile";
+import Students from "./pages/students";
+import SystemPerformance from "./pages/system-performance";
+import CompletionRate from "./pages/completion-rate";
+import Analytics from "./pages/analytics";
 import NotFound from "./pages/not-found";
 
 // Cyber Grid Background
@@ -300,6 +304,10 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/courses" component={Courses} />
           <Route path="/profile" component={Profile} />
+          <Route path="/students" component={Students} />
+          <Route path="/system-performance" component={SystemPerformance} />
+          <Route path="/completion-rate" component={CompletionRate} />
+          <Route path="/analytics" component={Analytics} />
         </>
       )}
       <Route component={NotFound} />
