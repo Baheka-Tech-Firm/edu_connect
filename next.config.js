@@ -6,13 +6,14 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
-  webpack: (config) => {
-    config.externals.push({
-      'utf-8-validate': 'commonjs utf-8-validate',
-      'bufferutil': 'commonjs bufferutil',
-    });
-    return config;
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:3001/api/:path*',
+      },
+    ]
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

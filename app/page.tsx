@@ -1,42 +1,101 @@
 'use client'
 
-import { useState } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment, Float, Text3D, Center } from '@react-three/drei'
+import React, { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BookOpen, Users, Award, Brain, GraduationCap, Target } from 'lucide-react'
-import Link from 'next/link'
 
+// Simple 3D-like CSS animation component
 function Scene3D() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Set canvas size
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
+
+    let animationId: number
+    let rotation = 0
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      
+      // Create gradient background
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
+      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)')
+      gradient.addColorStop(1, 'rgba(147, 51, 234, 0.1)')
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      // Draw floating geometric shapes
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
+
+      // Rotating cube outline
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.6)'
+      ctx.lineWidth = 2
+      const size = 60
+      const x = centerX + Math.sin(rotation * 0.5) * 20
+      const y = centerY + Math.cos(rotation * 0.3) * 15
+
+      ctx.save()
+      ctx.translate(x, y)
+      ctx.rotate(rotation)
+      ctx.strokeRect(-size/2, -size/2, size, size)
+      ctx.restore()
+
+      // Floating circles
+      for (let i = 0; i < 5; i++) {
+        const angle = (rotation + i * Math.PI / 2.5) * 0.8
+        const radius = 80 + i * 20
+        const circleX = centerX + Math.cos(angle) * radius
+        const circleY = centerY + Math.sin(angle) * radius
+        
+        ctx.beginPath()
+        ctx.arc(circleX, circleY, 8 - i, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(59, 130, 246, ${0.8 - i * 0.15})`
+        ctx.fill()
+      }
+
+      // EduConnect text with glow effect
+      ctx.font = 'bold 32px Arial'
+      ctx.textAlign = 'center'
+      ctx.shadowColor = 'rgba(59, 130, 246, 0.5)'
+      ctx.shadowBlur = 10
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.9)'
+      ctx.fillText('EduConnect', centerX, centerY - 20)
+      
+      ctx.font = '16px Arial'
+      ctx.shadowBlur = 5
+      ctx.fillStyle = 'rgba(147, 51, 234, 0.8)'
+      ctx.fillText('Future of Education', centerX, centerY + 10)
+      
+      rotation += 0.01
+      animationId = requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+      }
+    }
+  }, [])
+
   return (
-    <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <Environment preset="city" />
-      
-      <Float
-        speed={1.5}
-        rotationIntensity={0.5}
-        floatIntensity={0.5}
-        floatingRange={[0, 1]}
-      >
-        <Center>
-          <Text3D
-            font="/fonts/helvetiker_regular.typeface.json"
-            size={1.5}
-            height={0.3}
-            curveSegments={12}
-          >
-            EduConnect
-            <meshNormalMaterial />
-          </Text3D>
-        </Center>
-      </Float>
-      
-      <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-    </Canvas>
+    <canvas 
+      ref={canvasRef}
+      className="w-full h-full"
+      style={{ background: 'transparent' }}
+    />
   )
 }
 
@@ -85,14 +144,14 @@ export default function HomePage() {
               EduConnect
             </motion.h1>
             <div className="flex space-x-4">
-              <Link href="/auth/login">
+              <a href="/api/login">
                 <Button variant="outline">Sign In</Button>
-              </Link>
-              <Link href="/auth/register">
+              </a>
+              <a href="/api/login">
                 <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                   Get Started
                 </Button>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
@@ -133,7 +192,7 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.6 }}
             >
-              <Link href="/auth/register">
+              <a href="/api/login">
                 <Button 
                   size="lg"
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
@@ -143,7 +202,7 @@ export default function HomePage() {
                   <GraduationCap className="mr-2 h-5 w-5" />
                   Start Your Journey
                 </Button>
-              </Link>
+              </a>
             </motion.div>
           </div>
         </div>
@@ -242,7 +301,7 @@ export default function HomePage() {
               Join thousands of educators who are already using EduConnect to create 
               engaging learning experiences and improve student outcomes.
             </p>
-            <Link href="/auth/register">
+            <a href="/api/login">
               <Button 
                 size="lg"
                 variant="secondary"
@@ -251,7 +310,7 @@ export default function HomePage() {
                 <Brain className="mr-2 h-5 w-5" />
                 Start Free Trial
               </Button>
-            </Link>
+            </a>
           </motion.div>
         </div>
       </section>
