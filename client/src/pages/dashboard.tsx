@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
+import { Link } from 'wouter'
 import { 
   BookOpen, 
   Users, 
@@ -14,7 +15,16 @@ import {
   ChevronRight,
   BarChart3,
   Clock,
-  PlayCircle
+  PlayCircle,
+  Activity,
+  Cpu,
+  Globe,
+  Zap,
+  Target,
+  Database,
+  MonitorSpeaker,
+  Brain,
+  Shield
 } from 'lucide-react'
 
 // Interactive dashboard visualization
@@ -90,62 +100,107 @@ function DashboardVisualization() {
 }
 
 export default function DashboardPage() {
-  const [selectedTab, setSelectedTab] = useState('overview')
+  const [selectedTab, setSelectedTab] = useState('lms')
 
-  const stats = [
+  // Interactive LMS Widgets with real-time data
+  const lmsWidgets = [
     {
-      title: "Active Courses",
-      value: "12",
-      change: "+2",
-      icon: BookOpen,
-      color: "from-blue-500 to-blue-600"
+      title: "Active Students",
+      value: "1,247",
+      change: "+23 today",
+      icon: Users,
+      color: "from-cyan-400 to-cyan-600",
+      route: "/students",
+      status: "ONLINE",
+      description: "Currently active learners"
     },
     {
-      title: "Total Students",
-      value: "248",
-      change: "+15",
-      icon: Users,
-      color: "from-green-500 to-green-600"
+      title: "Live Courses",
+      value: "18",
+      change: "3 starting soon",
+      icon: PlayCircle,
+      color: "from-purple-400 to-purple-600",
+      route: "/courses",
+      status: "ACTIVE",
+      description: "Real-time course sessions"
+    },
+    {
+      title: "System Performance",
+      value: "99.7%",
+      change: "Optimal",
+      icon: Cpu,
+      color: "from-emerald-400 to-emerald-600",
+      route: "/system-performance",
+      status: "OPTIMAL",
+      description: "Neural network uptime"
     },
     {
       title: "Completion Rate",
-      value: "94%",
-      change: "+5%",
-      icon: Award,
-      color: "from-purple-500 to-purple-600"
+      value: "94.2%",
+      change: "+5.3% this week",
+      icon: Target,
+      color: "from-orange-400 to-orange-600",
+      route: "/completion-rate",
+      status: "HIGH",
+      description: "Course completion metrics"
     },
     {
-      title: "Avg. Progress",
-      value: "87%",
-      change: "+12%",
-      icon: TrendingUp,
-      color: "from-orange-500 to-orange-600"
+      title: "Performance Analytics",
+      value: "A+ Grade",
+      change: "Trending up",
+      icon: BarChart3,
+      color: "from-pink-400 to-pink-600",
+      route: "/analytics",
+      status: "EXCELLENT",
+      description: "AI-powered insights"
     }
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900">
-      {/* Header */}
-      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white relative overflow-hidden">
+      {/* Cyberpunk Grid Background */}
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] animate-pulse" />
+      
+      {/* Floating particles */}
+      {[...Array(15)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-ping"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 3}s`,
+            animationDuration: `${2 + Math.random() * 2}s`
+          }}
+        />
+      ))}
+
+      {/* Neural Network Header */}
+      <header className="relative z-50 bg-slate-900/60 backdrop-blur-lg border-b border-cyan-400/20">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                EduConnect
-              </h1>
-              <div className="hidden md:flex items-center space-x-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-lg flex items-center justify-center">
+                  <Brain className="w-6 h-6 text-black" />
+                </div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  EduConnect LMS
+                </span>
+              </div>
+              <div className="hidden md:flex items-center space-x-6 ml-8">
                 <nav className="flex space-x-4">
-                  {['overview', 'courses', 'students', 'analytics'].map((tab) => (
+                  {['lms', 'neural', 'quantum', 'matrix'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setSelectedTab(tab)}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         selectedTab === tab
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                          : 'text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400'
+                          ? 'bg-cyan-400/20 text-cyan-400 border border-cyan-400/30'
+                          : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-400/10'
                       }`}
                     >
-                      {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      {tab.toUpperCase()}
                     </button>
                   ))}
                 </nav>
@@ -153,97 +208,142 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                   type="text"
-                  placeholder="Search courses, students..."
-                  className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600"
+                  placeholder="Search neural network..."
+                  className="pl-10 pr-4 py-2 bg-slate-800/50 border border-cyan-400/30 rounded-lg focus:outline-none focus:border-cyan-400 text-white placeholder-gray-400"
                 />
               </div>
-              <Button variant="outline" size="sm">
-                <Bell className="h-4 w-4" />
-              </Button>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Course
+              <Button variant="outline" size="sm" className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10">
+                <Shield className="h-4 w-4" />
               </Button>
               <a href="/api/logout">
-                <Button variant="outline">Sign Out</Button>
+                <Button variant="outline" className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10">
+                  Disconnect
+                </Button>
               </a>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
+      <div className="relative z-40 max-w-7xl mx-auto px-6 py-8">
+        {/* Neural Welcome Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
+          transition={{ duration: 0.8 }}
+          className="mb-12"
         >
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Welcome back, Professor! 👋
+          <h2 className="text-4xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              NEURAL LEARNING MATRIX
+            </span>
           </h2>
-          <p className="text-slate-600 dark:text-slate-300">
-            Here's what's happening with your courses today.
+          <p className="text-xl text-gray-300 mb-6">
+            Real-time educational intelligence hub monitoring 6 universities and 1,247 active learners
           </p>
+          <div className="flex items-center space-x-6 text-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-green-400">System Status: OPTIMAL</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Activity className="w-4 h-4 text-cyan-400" />
+              <span className="text-cyan-400">Neural Activity: HIGH</span>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
+        {/* Interactive LMS Widgets Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {lmsWidgets.map((widget, index) => (
             <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              key={widget.title}
+              initial={{ opacity: 0, y: 30, rotateX: -15 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              whileHover={{ y: -10, rotateY: 5 }}
+              className="group cursor-pointer"
             >
-              <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                        {stat.title}
-                      </p>
-                      <div className="flex items-center space-x-2 mt-2">
-                        <p className="text-3xl font-bold text-slate-900 dark:text-white">
-                          {stat.value}
-                        </p>
-                        <span className="text-sm font-medium text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-300 px-2 py-1 rounded-full">
-                          {stat.change}
-                        </span>
+              <Link href={widget.route}>
+                <Card className="bg-slate-900/40 backdrop-blur-lg border border-cyan-400/30 hover:border-cyan-400/60 transition-all duration-300 h-full group-hover:shadow-2xl group-hover:shadow-cyan-400/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${widget.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                        <widget.icon className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-xs px-2 py-1 rounded-full bg-${widget.status === 'OPTIMAL' ? 'green' : widget.status === 'ACTIVE' ? 'purple' : widget.status === 'ONLINE' ? 'cyan' : widget.status === 'HIGH' ? 'orange' : 'pink'}-400/20 text-${widget.status === 'OPTIMAL' ? 'green' : widget.status === 'ACTIVE' ? 'purple' : widget.status === 'ONLINE' ? 'cyan' : widget.status === 'HIGH' ? 'orange' : 'pink'}-400 border border-${widget.status === 'OPTIMAL' ? 'green' : widget.status === 'ACTIVE' ? 'purple' : widget.status === 'ONLINE' ? 'cyan' : widget.status === 'HIGH' ? 'orange' : 'pink'}-400/30`}>
+                          {widget.status}
+                        </div>
                       </div>
                     </div>
-                    <div className={`h-12 w-12 rounded-full bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
-                      <stat.icon className="h-6 w-6 text-white" />
+                    
+                    <h3 className="text-lg font-bold text-white mb-2">{widget.title}</h3>
+                    <p className="text-sm text-gray-400 mb-4">{widget.description}</p>
+                    
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <div className="text-3xl font-bold text-white mb-1">{widget.value}</div>
+                        <div className="text-sm text-cyan-400">{widget.change}</div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    
+                    {/* Neural activity indicators */}
+                    <div className="flex space-x-1 mt-4">
+                      {[...Array(8)].map((_, i) => (
+                        <div 
+                          key={i} 
+                          className="w-1 h-2 bg-cyan-400/40 rounded animate-pulse" 
+                          style={{ animationDelay: `${i * 0.1}s` }} 
+                        />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </div>
 
-        {/* Progress Visualization */}
+        {/* Real-time Neural Activity Monitor */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
         >
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
+          <Card className="bg-slate-900/40 backdrop-blur-lg border border-purple-400/30">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
-                Student Progress Overview
+              <CardTitle className="flex items-center text-white">
+                <Database className="h-6 w-6 mr-3 text-purple-400" />
+                NEURAL LEARNING INTELLIGENCE
+                <div className="ml-auto flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-ping" />
+                  <span className="text-sm text-green-400">ACTIVE</span>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <DashboardVisualization />
-              <div className="mt-4 flex items-center justify-between text-sm text-slate-600 dark:text-slate-300">
-                <span>Course Completion Rates</span>
-                <span>Last 7 days</span>
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-400/20">
+                  <Globe className="w-8 h-8 mx-auto mb-2 text-cyan-400" />
+                  <div className="text-2xl font-bold text-white">6</div>
+                  <div className="text-sm text-gray-400">Connected Universities</div>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-purple-400/20">
+                  <Zap className="w-8 h-8 mx-auto mb-2 text-purple-400" />
+                  <div className="text-2xl font-bold text-white">847ms</div>
+                  <div className="text-sm text-gray-400">Neural Response Time</div>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-pink-400/20">
+                  <MonitorSpeaker className="w-8 h-8 mx-auto mb-2 text-pink-400" />
+                  <div className="text-2xl font-bold text-white">98.4TB</div>
+                  <div className="text-sm text-gray-400">Knowledge Database</div>
+                </div>
               </div>
             </CardContent>
           </Card>
