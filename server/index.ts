@@ -42,7 +42,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const server = createServer(app);
 
-server.listen(port, "0.0.0.0", () => {
+server.listen(Number(port), "0.0.0.0", () => {
   console.log(`🚀 EduConnect server running on port ${port}`);
   console.log(`📱 Access your app at http://localhost:${port}`);
 });
