@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "./hooks/useAuth";
 import { Switch, Route } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "./components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { BookOpen, Users, Award, Brain, GraduationCap, Target } from 'lucide-react'
-import Home from "@/pages/dashboard";
-import Courses from "@/pages/courses";
-import Profile from "@/pages/profile";
-import NotFound from "@/pages/not-found";
+import Home from "./pages/dashboard";
+import Courses from "./pages/courses";
+import Profile from "./pages/profile";
+import NotFound from "./pages/not-found";
 
 // Interactive 3D visualization component
 function Scene3D() {
