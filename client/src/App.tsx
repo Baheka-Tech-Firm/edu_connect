@@ -1,349 +1,286 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from "./hooks/useAuth";
 import { Switch, Route } from "wouter";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
-import { BookOpen, Users, Award, Brain, GraduationCap, Target } from 'lucide-react'
+import { BookOpen, Users, Award, Brain, GraduationCap, Target, Zap, Rocket, Globe, Shield, Cpu, Database } from 'lucide-react'
 import Home from "./pages/dashboard";
 import Courses from "./pages/courses";
 import Profile from "./pages/profile";
 import NotFound from "./pages/not-found";
 
-// Interactive 3D visualization component
-function Scene3D() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
-
-    let animationId: number
-    let rotation = 0
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
-      // Create gradient background
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
-      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)')
-      gradient.addColorStop(1, 'rgba(147, 51, 234, 0.1)')
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-      // Draw floating geometric shapes
-      const centerX = canvas.width / 2
-      const centerY = canvas.height / 2
-
-      // Rotating cube outline
-      ctx.strokeStyle = 'rgba(59, 130, 246, 0.6)'
-      ctx.lineWidth = 2
-      const size = 60
-      const x = centerX + Math.sin(rotation * 0.5) * 20
-      const y = centerY + Math.cos(rotation * 0.3) * 15
-
-      ctx.save()
-      ctx.translate(x, y)
-      ctx.rotate(rotation)
-      ctx.strokeRect(-size/2, -size/2, size, size)
-      ctx.restore()
-
-      // Floating circles
-      for (let i = 0; i < 5; i++) {
-        const angle = (rotation + i * Math.PI / 2.5) * 0.8
-        const radius = 80 + i * 20
-        const circleX = centerX + Math.cos(angle) * radius
-        const circleY = centerY + Math.sin(angle) * radius
-        
-        ctx.beginPath()
-        ctx.arc(circleX, circleY, 8 - i, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(59, 130, 246, ${0.8 - i * 0.15})`
-        ctx.fill()
-      }
-
-      // EduConnect text with glow effect
-      ctx.font = 'bold 32px Arial'
-      ctx.textAlign = 'center'
-      ctx.shadowColor = 'rgba(59, 130, 246, 0.5)'
-      ctx.shadowBlur = 10
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.9)'
-      ctx.fillText('EduConnect', centerX, centerY - 20)
-      
-      ctx.font = '16px Arial'
-      ctx.shadowBlur = 5
-      ctx.fillStyle = 'rgba(147, 51, 234, 0.8)'
-      ctx.fillText('Future of Education', centerX, centerY + 10)
-      
-      rotation += 0.01
-      animationId = requestAnimationFrame(animate)
-    }
-
-    animate()
-
-    return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId)
-      }
-    }
-  }, [])
-
+// Cyber Grid Background
+function CyberGrid() {
   return (
-    <canvas 
-      ref={canvasRef}
-      className="w-full h-full"
-      style={{ background: 'transparent' }}
-    />
+    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] animate-pulse" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.1)_0%,transparent_50%)]" />
+      </div>
+      
+      {/* Floating particles */}
+      {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-ping"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 3}s`,
+            animationDuration: `${2 + Math.random() * 2}s`
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Glowing orb component
+function GlowingOrb({ className, color = "cyan" }: { className?: string, color?: string }) {
+  return (
+    <div className={`absolute rounded-full ${className}`}>
+      <div className={`w-full h-full rounded-full bg-${color}-400/20 animate-pulse`} />
+      <div className={`absolute inset-2 rounded-full bg-${color}-400/40 animate-ping`} />
+      <div className={`absolute inset-4 rounded-full bg-${color}-400/60`} />
+    </div>
   )
 }
 
 function LandingPage() {
-  const [isHovered, setIsHovered] = useState(false)
+  const [activeSection, setActiveSection] = useState(0)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-  const features = [
-    {
-      icon: BookOpen,
-      title: "Course Management",
-      description: "Create and manage interactive courses with 3D visualizations and gamified learning paths.",
-      gradient: "from-blue-500 to-blue-600"
-    },
-    {
-      icon: Users,
-      title: "Student Engagement", 
-      description: "Foster collaboration through virtual classrooms and real-time interactive sessions.",
-      gradient: "from-green-500 to-green-600"
-    },
-    {
-      icon: Award,
-      title: "Progress Tracking",
-      description: "Monitor student progress with detailed analytics and personalized learning insights.",
-      gradient: "from-purple-500 to-purple-600"
-    },
-    {
-      icon: Brain,
-      title: "AI Assistant",
-      description: "Leverage AI tools for lesson planning, grading, and personalized student support.",
-      gradient: "from-orange-500 to-orange-600"
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY })
     }
-  ]
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900">
-      {/* Navigation */}
-      <nav className="relative z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <motion.h1 
-              className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              EduConnect
-            </motion.h1>
-            <div className="flex space-x-4">
-              <a href="/api/login">
-                <Button variant="outline">Sign In</Button>
-              </a>
-              <a href="/api/login">
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                  Get Started
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen text-white relative overflow-hidden">
+      <CyberGrid />
+      
+      {/* Glowing orbs that follow mouse */}
+      <GlowingOrb 
+        className="w-32 h-32 top-20 left-20" 
+        color="cyan"
+      />
+      <GlowingOrb 
+        className="w-24 h-24 bottom-32 right-32" 
+        color="purple"
+      />
+      <GlowingOrb 
+        className="w-16 h-16 top-1/2 left-10" 
+        color="pink"
+      />
 
-      {/* Hero Section with 3D Background */}
-      <section className="relative overflow-hidden py-20 lg:py-32">
-        <div className="absolute inset-0 z-0">
-          <Scene3D />
-        </div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <motion.h2 
-              className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-6"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-            >
-              Welcome to the Future of
-              <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Education
-              </span>
-            </motion.h2>
-            
-            <motion.p 
-              className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-10"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-            >
-              Experience immersive learning with AI-powered tools, 3D visualizations, and 
-              collaborative virtual environments that transform education.
-            </motion.p>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6 }}
-            >
-              <a href="/api/login">
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <GraduationCap className="mr-2 h-5 w-5" />
-                  Start Your Journey
-                </Button>
-              </a>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Futuristic Navigation */}
+      <nav className="relative z-50 p-6">
+        <div className="flex items-center justify-between">
           <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            viewport={{ once: true }}
+            className="flex items-center space-x-3"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-              Powerful Features for Modern Education
-            </h3>
-            <p className="text-lg text-slate-600 dark:text-slate-300">
-              Everything you need to create engaging and effective learning experiences
-            </p>
+            <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-lg flex items-center justify-center">
+              <Cpu className="w-6 h-6 text-black" />
+            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              EduConnect
+            </span>
           </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -5 }}
-              >
-                <Card className="h-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <CardHeader className="text-center">
-                    <div className={`mx-auto h-16 w-16 rounded-full bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4`}>
-                      <feature.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-600 dark:text-slate-300 text-center">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            {[
-              { number: "10K+", label: "Active Students", icon: Users },
-              { number: "500+", label: "Courses Available", icon: BookOpen },
-              { number: "95%", label: "Success Rate", icon: Target }
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.5 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="p-6"
-              >
-                <stat.icon className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-                <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-lg text-slate-600 dark:text-slate-300">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            viewport={{ once: true }}
+          
+          <motion.div 
+            className="flex space-x-4"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h3 className="text-3xl font-bold text-white mb-6">
-              Ready to Transform Education?
-            </h3>
-            <p className="text-xl text-blue-100 mb-8">
-              Join thousands of educators who are already using EduConnect to create 
-              engaging learning experiences and improve student outcomes.
-            </p>
             <a href="/api/login">
               <Button 
-                size="lg"
-                variant="secondary"
-                className="text-lg px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
+                variant="outline" 
+                className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10 hover:border-cyan-400"
               >
-                <Brain className="mr-2 h-5 w-5" />
-                Start Free Trial
+                <Shield className="w-4 h-4 mr-2" />
+                Access Portal
               </Button>
             </a>
           </motion.div>
         </div>
+      </nav>
+
+      {/* Hero Section - Hexagonal Design */}
+      <section className="relative z-40 flex items-center justify-center min-h-screen px-6">
+        <div className="text-center max-w-6xl">
+          {/* Central hexagon with content */}
+          <motion.div 
+            className="relative"
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 1.2, type: "spring" }}
+          >
+            {/* Main hexagonal container */}
+            <div className="relative w-96 h-96 mx-auto mb-12">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-purple-400/20 transform rotate-45 rounded-3xl backdrop-blur-lg border border-cyan-400/30" />
+              <div className="absolute inset-4 bg-gradient-to-br from-slate-900/80 to-slate-800/80 transform -rotate-12 rounded-2xl border border-purple-400/30" />
+              <div className="absolute inset-8 flex flex-col items-center justify-center">
+                <Rocket className="w-16 h-16 text-cyan-400 mb-4 animate-bounce" />
+                <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  NEURAL
+                </h1>
+                <h2 className="text-sm text-gray-400">EDUCATION HUB</h2>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.h1 
+            className="text-6xl md:text-8xl font-bold mb-8"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.5 }}
+          >
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              EduConnect
+            </span>
+          </motion.h1>
+
+          <motion.p 
+            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.7 }}
+          >
+            Next-generation learning platform with AI-driven insights, holographic interfaces, 
+            and quantum-speed processing for the digital education revolution.
+          </motion.p>
+
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.9 }}
+          >
+            <a href="/api/login">
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-black font-bold px-12 py-6 rounded-xl text-lg shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                <Zap className="mr-3 h-6 w-6" />
+                Initialize System
+              </Button>
+            </a>
+            <Button 
+              variant="outline"
+              size="lg"
+              className="border-2 border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10 px-12 py-6 rounded-xl text-lg backdrop-blur-sm"
+            >
+              <Globe className="mr-3 h-6 w-6" />
+              Explore Matrix
+            </Button>
+          </motion.div>
+        </div>
+
+        {/* Floating tech panels */}
+        <motion.div 
+          className="absolute top-32 left-12 w-48 h-32 bg-slate-900/40 backdrop-blur-lg border border-cyan-400/30 rounded-lg p-4"
+          initial={{ opacity: 0, x: -100, rotate: -10 }}
+          animate={{ opacity: 1, x: 0, rotate: 0 }}
+          transition={{ duration: 1, delay: 1.2 }}
+          whileHover={{ scale: 1.05, rotate: 2 }}
+        >
+          <Database className="w-8 h-8 text-cyan-400 mb-2" />
+          <h3 className="text-sm font-bold text-white">Neural Database</h3>
+          <p className="text-xs text-gray-400">Quantum storage matrix</p>
+          <div className="flex space-x-1 mt-2">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="w-2 h-1 bg-cyan-400/60 rounded animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="absolute bottom-32 right-12 w-48 h-32 bg-slate-900/40 backdrop-blur-lg border border-purple-400/30 rounded-lg p-4"
+          initial={{ opacity: 0, x: 100, rotate: 10 }}
+          animate={{ opacity: 1, x: 0, rotate: 0 }}
+          transition={{ duration: 1, delay: 1.4 }}
+          whileHover={{ scale: 1.05, rotate: -2 }}
+        >
+          <Brain className="w-8 h-8 text-purple-400 mb-2" />
+          <h3 className="text-sm font-bold text-white">AI Core</h3>
+          <p className="text-xs text-gray-400">Adaptive learning engine</p>
+          <div className="flex justify-between mt-2">
+            <div className="w-4 h-4 bg-purple-400/60 rounded-full animate-ping" />
+            <div className="w-4 h-4 bg-purple-400/40 rounded-full animate-pulse" />
+            <div className="w-4 h-4 bg-purple-400/80 rounded-full animate-bounce" />
+          </div>
+        </motion.div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h4 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-              EduConnect
-            </h4>
-            <p className="text-slate-400 mb-6">
-              Transforming education through technology and innovation
-            </p>
-            <div className="flex justify-center space-x-6">
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                Contact Us
-              </a>
+      {/* Feature Matrix */}
+      <section className="relative z-40 py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <motion.h2 
+            className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            SYSTEM CAPABILITIES
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { icon: BookOpen, title: "QUANTUM COURSES", desc: "Multi-dimensional learning paths", color: "cyan" },
+              { icon: Users, title: "NEURAL NETWORK", desc: "Connected learner ecosystem", color: "purple" },
+              { icon: Award, title: "ACHIEVEMENT CORE", desc: "Gamified progression system", color: "pink" },
+              { icon: Brain, title: "AI INSTRUCTOR", desc: "Personalized teaching AI", color: "cyan" },
+              { icon: Globe, title: "VIRTUAL REALITY", desc: "Immersive learning worlds", color: "purple" },
+              { icon: Zap, title: "INSTANT SYNC", desc: "Real-time collaboration", color: "pink" }
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 50, rotateX: -30 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -10, rotateY: 5 }}
+                className="group"
+              >
+                <div className={`relative p-6 bg-slate-900/60 backdrop-blur-lg border border-${feature.color}-400/30 rounded-xl hover:border-${feature.color}-400/60 transition-all duration-300`}>
+                  <div className={`w-16 h-16 bg-gradient-to-br from-${feature.color}-400/20 to-${feature.color}-600/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <feature.icon className={`w-8 h-8 text-${feature.color}-400`} />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
+                  <p className="text-gray-400 text-sm">{feature.desc}</p>
+                  <div className={`absolute inset-0 bg-gradient-to-br from-${feature.color}-400/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity`} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Data Stream Footer */}
+      <footer className="relative z-40 py-12 border-t border-cyan-400/20">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="flex justify-center items-center space-x-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center">
+              <Cpu className="w-6 h-6 text-black" />
             </div>
-            <div className="mt-8 pt-8 border-t border-slate-700">
-              <p className="text-slate-400">
-                © 2024 EduConnect. All rights reserved.
-              </p>
-            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              EduConnect Neural Network
+            </span>
+          </div>
+          <p className="text-gray-400 mb-4">© 2024 - Quantum Education Systems</p>
+          <div className="flex justify-center space-x-8 text-sm text-gray-500">
+            <span>Neural Privacy</span>
+            <span>Quantum Terms</span>
+            <span>System Status</span>
           </div>
         </div>
       </footer>
