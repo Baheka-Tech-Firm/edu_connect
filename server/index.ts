@@ -35,13 +35,13 @@ app.get("/api/auth/user", (req, res) => {
   });
 });
 
-// Serve static files
-app.use(express.static(path.join(__dirname, "../client/dist")));
-
 // Route main page to futuristic dashboard
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/main-dashboard.html'));
 });
+
+// Serve static files
+app.use(express.static(path.join(__dirname, "../client/dist")));
 
 // Catch all handler for SPA
 app.get('*', (req, res) => {
