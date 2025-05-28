@@ -21,10 +21,17 @@ app.get("/api/logout", (req, res) => {
 
 app.get("/api/auth/user", (req, res) => {
   res.json({ 
-    id: "demo", 
-    name: "Demo User", 
-    email: "demo@educonnect.com",
-    role: "teacher" 
+    id: "demo-001", 
+    name: "Dr. Alex Morgan", 
+    email: "alex.morgan@educonnect.com",
+    role: "administrator",
+    avatar: "AM",
+    department: "Computer Science",
+    courses: 8,
+    students: 342,
+    achievements: ["Top Educator 2024", "Innovation Award", "5-Star Rating"],
+    joinDate: "2022-01-15",
+    lastActive: "2 minutes ago"
   });
 });
 
