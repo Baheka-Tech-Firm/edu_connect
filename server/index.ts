@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Simple auth routes for demo
+// Auth routes
 app.get("/api/login", (req, res) => {
   res.redirect("/?auth=demo");
 });
@@ -21,24 +21,33 @@ app.get("/api/logout", (req, res) => {
 
 app.get("/api/auth/user", (req, res) => {
   res.json({ 
-    id: "demo", 
-    name: "Demo User", 
-    email: "demo@educonnect.com",
-    role: "teacher" 
+    id: "demo-001", 
+    name: "Dr. Alex Morgan", 
+    email: "alex.morgan@educonnect.com",
+    role: "administrator",
+    avatar: "AM",
+    department: "Computer Science",
+    courses: 8,
+    students: 342,
+    achievements: ["Top Educator 2024", "Innovation Award", "5-Star Rating"],
+    joinDate: "2022-01-15",
+    lastActive: "2 minutes ago"
   });
 });
 
-// Setup Vite middleware for development
-if (process.env.NODE_ENV !== "production") {
-  const vite = await (await import("vite")).createServer({
-    server: { middlewareMode: true },
-    appType: "custom",
-    root: path.resolve(__dirname, "..", "client"),
-  });
+// Route main page to futuristic dashboard
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/main-dashboard.html'));
+});
 
-  app.use(vite.ssrFixStacktrace);
-  app.use(vite.middlewares);
-}
+// Serve static files
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
+// Catch all handler for SPA
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) return;
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 const server = createServer(app);
 
