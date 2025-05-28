@@ -28,18 +28,14 @@ app.get("/api/auth/user", (req, res) => {
   });
 });
 
-// Setup Vite middleware for development
-if (process.env.NODE_ENV !== "production") {
-  const { createServer: createViteServer } = await import("vite");
-  const vite = await createViteServer({
-    server: { middlewareMode: true },
-    appType: "custom",
-    root: "./client",
-  });
+// Serve static files
+app.use(express.static(path.join(__dirname, "../client/dist")));
 
-  app.use(vite.ssrFixStacktrace);
-  app.use(vite.middlewares);
-}
+// Catch all handler for SPA
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) return;
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 const server = createServer(app);
 
